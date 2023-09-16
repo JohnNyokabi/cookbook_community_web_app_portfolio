@@ -1,0 +1,8 @@
+{
+  "watch": ["app.js", "secret_key_gen.js"],
+  "ext": "js",
+  "execMap": {
+    "js": "node"
+  },
+  "delay": "1000"
+}
