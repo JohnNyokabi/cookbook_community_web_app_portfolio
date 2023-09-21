@@ -76,16 +76,16 @@
 
           <div class="group">
             <label>Ingredients</label>
-            <div class="ingredient" v-for="i in editedRecipe.ingredientRows" :key="i">
-              <input type="text" v-model="editedRecipe.ingredients[i - 1]" />
+            <div class="ingredient" v-for="(ingredient, index) in editedRecipe.ingredients" :key="index">
+              <input type="text" v-model="editedRecipe.ingredients[index]" />
             </div>
             <button type="button" @click="editNewIngredient">Add Ingredient</button>
           </div>
 
           <div class="group">
             <label>Method</label>
-            <div class="method" v-for="i in editedRecipe.methodRows" :key="i">
-              <textarea v-model="editedRecipe.method[i - 1]"></textarea>
+            <div class="method" v-for="(step, index) in editedRecipe.method" :key="index">
+              <textarea v-model="editedRecipe.method[index]"></textarea>
             </div>
             <button type="button" @click="editNewStep">Add Step</button>
           </div>
@@ -122,9 +122,18 @@ export default {
       ingredientRows: 1,
       methodRows: 1
     });
+
+    const editedRecipe = ref({
+      title: '',
+      description: '',
+      ingredients: [],
+      method: [],
+      ingredientRows: 1,
+      methodRows: 1,
+    });
+
     const popupOpen = ref(false);
     const editPopupOpen = ref(false);
-    const editedRecipe = ref(null);
 
     const togglePopup = () => {
       popupOpen.value = !popupOpen.value;
@@ -142,25 +151,38 @@ export default {
       newRecipe.value.methodRows++;
     };
 
-    const editRecipe = (recipe) => {
-      editedRecipe.value = { ...recipe };
-      console.log('Editing Recipe:', editedRecipe.value);
-      toggleEditPopup();
+    const editRecipe = async (recipe) => {
+      try {
+        const response = await axios.get(`http://localhost:5000/recipes/${recipe._id}`);
+        editedRecipe.value = response.data;
+        toggleEditPopup();
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     const editNewIngredient = () => {
-      editedRecipe.value.ingredientRows++;
+      editedRecipe.value.ingredients.push('');
     };
 
     const editNewStep = () => {
-      editedRecipe.value.methodRows++;
+      editedRecipe.value.method.push('');
     };
 
     const saveEditedRecipe = async () => {
       try {
-        const index = store.state.recipes.findIndex((r) => r._id === editedRecipe.value._id);
-        const response = await axios.patch(`http://localhost:5000/recipes/${editedRecipe.value._id}`, editedRecipe.value);
-        store.commit('UPDATE_RECIPE', { index, updatedRecipe: response.data });
+        const response = await axios.patch(
+          `http://localhost:5000/recipes/${editedRecipe.value._id}`,
+          editedRecipe.value
+        );
+
+        const updatedRecipe = response.data;
+        const index = store.state.recipes.findIndex((r) => r._id === updatedRecipe._id);
+
+        if (index !== -1) {
+          store.commit('UPDATE_RECIPE', { index, updatedRecipe });
+        }
+
         toggleEditPopup();
       } catch (error) {
         console.error(error);
@@ -168,7 +190,6 @@ export default {
     };
 
     const cancelEdit = () => {
-      editedRecipe.value = null;
       toggleEditPopup();
     };
 
@@ -226,6 +247,7 @@ export default {
       editPopupOpen,
       editedRecipe,
       editRecipe,
+      toggleEditPopup,
       editNewIngredient,
       editNewStep,
       saveEditedRecipe,
