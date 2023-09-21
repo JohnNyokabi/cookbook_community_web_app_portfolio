@@ -40,7 +40,6 @@ export default {
 }
 
 body {
-  /*background-color: #030e1b;*/
   background: url("./assets/images/wallpaperflare.com_wallpaper (3).jpg") no-repeat center / cover;
   min-height: 100vh;
   display: flex;
@@ -159,7 +158,7 @@ input {
 
   box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
   background-color: rgba(255, 255, 255, 0.993);
-  border-radius: 0px 16px 0px 16px;
+  border-radius: 15px;
   transition: 0.4s;
 }
 

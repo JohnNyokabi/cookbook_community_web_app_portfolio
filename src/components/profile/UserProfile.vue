@@ -24,9 +24,9 @@
         </div>
         <div>
           <label for="profilePicture">Profile Picture:</label>
-          <input type="file" id="profilePicture" @change="handleFileUpload" />
+          <input type="file" id="profilePicture" @change="handleProfilePictureUpload" />
         </div>
-        <button type="submit">Save</button>
+        <button type="submit">Update Profile</button>
       </form>
     </div>
   </div>
@@ -50,9 +50,20 @@ export default {
   },
   methods: {
     async fetchUserData() {
-      const response = await axios.get('/api/user');
-      console.log('User Data:', response.data);
-      this.user = response.data;
+      try {
+        console.log('Fetching user data ...')
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:5000/api/user', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }, 
+        });
+
+        console.log('User Data:', response.data);
+        this.user = response.data;
+      } catch (error) {
+        console.error(error);
+      }
     },
     
     toggleEditMode() {
@@ -61,24 +72,35 @@ export default {
         this.editedUser = { ...this.user };
       }
     },
-    async handleFileUpload(event) {
+    
+    handleProfilePictureUpload(event) {
       this.editedUser.profilePicture = event.target.files[0];
     },
+    
     async updateUserProfile() {
+      const token = localStorage.getItem('token');
       const formData = new FormData();
       formData.append('firstName', this.editedUser.firstName);
       formData.append('lastName', this.editedUser.lastName);
       formData.append('email', this.editedUser.email);
-      formData.append('profilePicture', this.editedUser.profilePicture);
+
+      if (this.editedUser.profilePicture) {
+        formData.append('profilePicture', this.editedUser.profilePicture);
+      }
 
       try {
-        const response = await axios.put('/api/user', formData);
+        const response = await axios.put('http://localhost:5000/user', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`,
+          },
+        });
         this.user = response.data;
         this.editMode = false;
       } catch (error) {
-        console.error(error);
+        console.error('Error updating the user\'s profile: ', error);
       }
-    },
+    }
   },
   mounted() {
     this.fetchUserData();

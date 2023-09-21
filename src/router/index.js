@@ -8,7 +8,7 @@ const routes = [
     component: HomeView
   },
   {
-    path: '/recipe/:slug',
+    path: '/recipe/:id',
     name: 'Recipe',
     component: () => import('../views/Recipe.vue')
   },
@@ -25,7 +25,8 @@ const routes = [
   {
     path: '/userProfile',
     name: 'Profile',
-    component: () => import('../components/profile/UserProfile.vue')
+    component: () => import('../components/profile/UserProfile.vue'),
+    meta: { requiresAuth: true }
   },
   {
     path: '/forgotPassword',
@@ -43,5 +44,18 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    const isAuthenticated = '/';
+    if (isAuthenticated) {
+      next();
+    } else {
+      next('/login');
+    }
+  } else {
+    next();
+  }
+});
 
 export default router

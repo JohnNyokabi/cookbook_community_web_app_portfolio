@@ -1,29 +1,27 @@
 <template>
-	<div class="recipe">
-		<router-link to="/">&lt; Back</router-link>
-		<h1>{{ recipe.title }}</h1>
-		<p class="desc">{{ recipe.description }}</p>
-		<hr />
-		<div class="ingredients">
-			<h3>Ingredients</h3>
-			<ul>
-				<li v-for="(ingredient, i) in recipe.ingredients" :key="i">
-					{{ ingredient }}
-				</li>
-			</ul>
-		</div>
-
-		<div class="method">
-			<h3>Method</h3>
-			<ol>
-				<li v-for="(step, i) in recipe.method" :key="i">
-					<span v-html="cleanText(step)"></span>
-				</li>
-			</ol>
-		</div>
-	</div>
+  <div class="recipe">
+    <router-link to="/">&lt; Back</router-link>
+    <h1>{{ recipe ? recipe.title : 'Loading...' }}</h1>
+    <p class="desc">{{ recipe ? recipe.description : 'Loading...' }}</p>
+    <hr />
+    <div class="ingredients" v-if="recipe && recipe.ingredients">
+      <h3>Ingredients</h3>
+      <ul>
+        <li v-for="(ingredient, i) in recipe.ingredients" :key="i">
+          {{ ingredient }}
+        </li>
+      </ul>
+    </div>
+    <div class="method" v-if="recipe && recipe.method">
+      <h3>Method</h3>
+      <ol>
+        <li v-for="(step, i) in recipe.method" :key="i">
+          <span v-html="cleanText(step)"></span>
+        </li>
+      </ol>
+    </div>
+  </div>
 </template>
-
 <script>
 
 export default {
@@ -31,7 +29,9 @@ export default {
 
 	computed: {
 		recipe () {
-			return this.$store.state.recipes.find(recipe => recipe.slug === this.$route.params.slug)
+			const id = this.$route.params.id;
+			console.log('Route parameter ID:', id);
+			return this.$store.state.recipes.find(recipe => recipe._id === id);
 		}
 	},
 	methods: {

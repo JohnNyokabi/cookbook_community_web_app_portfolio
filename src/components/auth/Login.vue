@@ -57,10 +57,12 @@ export default {
       }
 
       try {
-        const res = await axios.post('login', {
+        const res = await axios.post('http://localhost:5000/login', {
           email: this.email,
           password: this.password
         });
+        
+        console.log('Login response:', res.data);
 
         localStorage.setItem('token', res.data.token);
         console.log('My most boring token generated during login: ', res.data.token);

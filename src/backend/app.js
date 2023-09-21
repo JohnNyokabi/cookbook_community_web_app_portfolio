@@ -26,8 +26,10 @@ db.once('open', () => {
 });
 
 const authRoutes = require('./routes/Auth');
+const recipeRoutes = require('./routes/recipes');
 
 app.use('/', authRoutes);
+app.use('/recipes', recipeRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
