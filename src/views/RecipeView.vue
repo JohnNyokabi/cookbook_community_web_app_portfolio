@@ -4,14 +4,15 @@
       <input 
         type="text" 
         class="search-bar" 
-        placeholder="Search an item"
+        placeholder="Search recipe by name or ingredient"
+        v-model="searchQuery"
       />
     </div>
     <h1>Available Recipes</h1>
     <button @click="togglePopup">Add new Recipe</button>
 
     <div class="recipes">
-      <div class="card" v-for="recipe in $store.state.recipes" :key="recipe._id">
+      <div class="card" v-for="recipe in filteredRecipes" :key="recipe._id">
         <h2>{{ recipe.title }}</h2>
         <p>{{ recipe.description }}</p>
         <router-link :to="`/recipe/${recipe._id}`">
@@ -57,6 +58,7 @@
           <button type="button" @click="togglePopup">Close</button>
         </form>
       </div>
+    
     </div>
 
     <div class="edit-recipe-popup" v-if="editPopupOpen">
@@ -99,13 +101,13 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted,computed } from 'vue';
 import { useStore } from 'vuex';
 import { mapGetters } from 'vuex';
 import axios from 'axios';
 
 export default {
-  name: 'HomeView',
+  name: 'RecipeView',
 
   computed: {
     ...mapGetters(['user'])
@@ -134,6 +136,19 @@ export default {
 
     const popupOpen = ref(false);
     const editPopupOpen = ref(false);
+    const searchQuery = ref('');
+
+    const filteredRecipes = computed(() => {
+      const query = searchQuery.value.toLowerCase();
+      return store.state.recipes.filter((recipe) => {
+        return (
+          recipe.title.toLowerCase().includes(query) ||
+          recipe.ingredients.some((ingredient) =>
+            ingredient.toLowerCase().includes(query)
+          )
+        );
+      });
+    });
 
     const togglePopup = () => {
       popupOpen.value = !popupOpen.value;
@@ -253,7 +268,9 @@ export default {
       saveEditedRecipe,
       cancelEdit,
       deleteRecipe,
-      addNewRecipe
+      addNewRecipe,
+      searchQuery,
+      filteredRecipes,
     };
   }
 }

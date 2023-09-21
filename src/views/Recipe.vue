@@ -1,9 +1,10 @@
 <template>
   <div class="recipe">
-    <router-link to="/">&lt; Back</router-link>
+    <router-link to="/recipe">&lt; Back</router-link>
     <h1>{{ recipe ? recipe.title : 'Loading...' }}</h1>
     <p class="desc">{{ recipe ? recipe.description : 'Loading...' }}</p>
     <hr />
+
     <div class="ingredients" v-if="recipe && recipe.ingredients">
       <h3>Ingredients</h3>
       <ul>
@@ -37,7 +38,7 @@ export default {
 	methods: {
 		cleanText (text) {
 			return text.replace(/\n/g, '<br />')
-		}
+		},
 	}
 }
 </script>

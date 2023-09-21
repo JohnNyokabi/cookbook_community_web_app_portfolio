@@ -2,11 +2,12 @@
   <nav>
     <div class="container">
       <router-link to="/" class="logo">Cook-Book</router-link>
-      <div class="menu">
-        <router-link to="/About" class="menu-item">About</router-link>
-      </div>
+      <router-link to="/recipe" class="recipe">Recipe</router-link>
       <div class="profile">
         <router-link to="/UserProfile">Profile</router-link>
+      </div>
+      <div class="menu">
+        <router-link to="/about" class="menu-item">About</router-link>
       </div>
       <div class="user">
         <router-link v-if="!user" to="/Login">Login</router-link>

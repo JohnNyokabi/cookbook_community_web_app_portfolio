@@ -59,4 +59,73 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// route to toggle for liking a recipe
+router.post('/user/favorite/:id', async (req, res) => {
+  const userId = req.user._id;
+  const recipeId = req.params.id;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+
+    if (!user.favorites.includes(recipeId)) {
+      user.favorites.push(recipeId);
+    }
+
+    await user.save();
+    res.status(200).send(user);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+// route to toggle for unliking a recipe
+router.post('/user/unfavorite/:id', async (req, res) => {
+  const userId = req.user._id;
+  const recipeId = req.params.id;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+
+    if (user.favorites.includes(recipeId)) {
+      user.favorites = user.favorites.filter((favorite) => favorite.toString() !== recipeId);
+    }
+
+    await user.save();
+    res.status(200).send(user);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+//route for posting a comment/review
+router.post('/comment/:id', async (req, res) => {
+  const recipeId = req.params.id;
+
+  try {
+    const recipe = await Recipe.findById(recipeId);
+
+    if (!recipe) {
+      return res.status(404).send('Recipe not found');
+    }
+
+    const newComment = {
+      text: req.body.text,
+      author: req.user.username,
+    };
+
+    recipe.comments.push(newComment);
+    await recipe.save();
+    res.status(201).send(newComment);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 module.exports = router;
